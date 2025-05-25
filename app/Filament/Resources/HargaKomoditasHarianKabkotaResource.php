@@ -55,8 +55,8 @@ class HargaKomoditasHarianKabkotaResource extends Resource
                     ->required(),
                 Select::make('id_komoditas')
                     ->label('Komoditas')
-                    ->relationship('komoditas', 'nama_pangan') // Assumes 'nama_pangan' is the display column in Komoditas
-                    ->options(Komoditas::pluck('nama_pangan', 'id_kmd')) // Use id_kmd as value
+                    ->relationship('komoditas', 'nm_kmd') // Changed from nama_pangan to nm_kmd
+                    ->options(Komoditas::pluck('nm_kmd', 'id_kmd')) // Changed from nama_pangan to nm_kmd
                     ->searchable()
                     ->preload()
                     ->required(),
@@ -86,7 +86,7 @@ class HargaKomoditasHarianKabkotaResource extends Resource
                 TextColumn::make('waktu')
                     ->date()
                     ->sortable(),
-                TextColumn::make('komoditas.nama_pangan') // Display name from related Komoditas model
+                TextColumn::make('komoditas.nm_kmd') // Changed from nama_pangan to nm_kmd
                     ->label('Komoditas')
                     ->sortable()
                     ->searchable(),

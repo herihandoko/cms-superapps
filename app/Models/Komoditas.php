@@ -21,7 +21,7 @@ class Komoditas extends Model
      *
      * @var string
      */
-    protected $table = 'master_komoditas';
+    protected $table = 'badanpangan_m_komoditas';
 
     /**
      * The primary key associated with the table.
@@ -66,30 +66,12 @@ class Komoditas extends Model
      */
     protected $fillable = [
         'id_kmd', // Primary key, assuming it needs to be manually set
-        'nama_pangan',
+        'nm_kmd', // Changed from nama_pangan
         'hpp_het', // Using this for the attribute, mapped to 'hpp/het' column via accessor/mutator
         'source',
-        'satuan',
+        // 'satuan', // Removed as it's not in the new DDL
     ];
 
-    /**
-     * Get the hpp_het attribute (maps to 'hpp/het' column).
-     *
-     * @return string|null
-     */
-    public function getHppHetAttribute(): ?string
-    {
-        return array_key_exists('hpp/het', $this->attributes) ? $this->attributes['hpp/het'] : null;
-    }
-
-    /**
-     * Set the hpp_het attribute (maps to 'hpp/het' column).
-     *
-     * @param  string|null  $value
-     * @return void
-     */
-    public function setHppHetAttribute(?string $value): void
-    {
-        $this->attributes['hpp/het'] = $value;
-    }
+    // Removed custom accessor and mutator for hpp_het as the database column is hpp_het (underscore)
+    // Eloquent will handle this automatically.
 }

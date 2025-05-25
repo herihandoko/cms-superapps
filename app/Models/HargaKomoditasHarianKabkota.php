@@ -22,7 +22,7 @@ class HargaKomoditasHarianKabkota extends Model
      *
      * @var string
      */
-    protected $table = 'harga_komoditas_harian_kabkota';
+    protected $table = 'badanpangan_op_hargakonsumen_komoditasharian_kabkota';
 
     /**
      * The primary key associated with the table.

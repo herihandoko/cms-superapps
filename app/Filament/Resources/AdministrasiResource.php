@@ -41,7 +41,7 @@ class AdministrasiResource extends Resource
             ->schema([
                 TextInput::make('kd_adm')
                     ->label('Kode Administrasi')
-                    ->numeric()
+                    // ->numeric() // Removed as kd_adm is now a string
                     ->nullable(),
                 TextInput::make('wilayah_adm')
                     ->label('Wilayah Administrasi')

@@ -45,8 +45,8 @@ class KomoditasResource extends Resource
                     ->required()
                     ->disabledOn('edit') // Assuming ID should not be changed after creation
                     ->unique(Komoditas::class, 'id_kmd', ignoreRecord: true),
-                TextInput::make('nama_pangan')
-                    ->label('Nama Pangan')
+                TextInput::make('nm_kmd')
+                    ->label('Nama Komoditas') // Changed label
                     ->required()
                     ->maxLength(255),
                 TextInput::make('hpp_het') // Uses the accessor/mutator for 'hpp/het'
@@ -55,9 +55,9 @@ class KomoditasResource extends Resource
                 TextInput::make('source')
                     ->label('Source')
                     ->maxLength(255),
-                TextInput::make('satuan')
-                    ->label('Satuan')
-                    ->maxLength(255),
+                // TextInput::make('satuan') // Removed
+                //    ->label('Satuan')
+                //    ->maxLength(255),
             ]);
     }
 
@@ -68,8 +68,8 @@ class KomoditasResource extends Resource
                 TextColumn::make('id_kmd')
                     ->label('ID Komoditas')
                     ->sortable(),
-                TextColumn::make('nama_pangan')
-                    ->label('Nama Pangan')
+                TextColumn::make('nm_kmd') // Changed from nama_pangan
+                    ->label('Nama Komoditas') // Changed label
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('hpp_het') // Uses the accessor for 'hpp/het'
@@ -78,9 +78,9 @@ class KomoditasResource extends Resource
                 TextColumn::make('source')
                     ->label('Source')
                     ->sortable(),
-                TextColumn::make('satuan')
-                    ->label('Satuan')
-                    ->sortable(),
+                // TextColumn::make('satuan') // Removed
+                //    ->label('Satuan')
+                //    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

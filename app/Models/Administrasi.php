@@ -57,6 +57,6 @@ class Administrasi extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'kd_adm' => 'integer', // Based on DDL kd_adm int NULL DEFAULT NULL
+        'kd_adm' => 'string', // Changed from integer to string
     ];
 }
