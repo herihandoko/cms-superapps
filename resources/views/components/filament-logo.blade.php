@@ -1,4 +1,12 @@
-<img src="{{ asset('images/logo-superapps.png') }}" alt="{{ config('app.name') }} Logo"
-     class="filament-brand-logo"
-     style="width: auto; object-fit: contain; @if(\Filament\Facades\Filament::hasDarkMode()) @else background-color: rgba(0,0,0,0.1); padding: 2px; border-radius: 3px; @endif"
+<img
+  x-data="{
+    mode: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+    lightLogo: @js(asset('images/logo-superapps-light.png')),
+    darkLogo: @js(asset('images/logo-superapps.png')),
+  }"
+  x-bind:src="mode === 'dark' ? darkLogo : lightLogo"
+  @dark-mode-toggled.window="mode = $event.detail"
+  alt="{{ config('app.name') }} Logo"
+  class="filament-brand-logo w-auto object-contain h-11 dark:h-11"
 />
+
