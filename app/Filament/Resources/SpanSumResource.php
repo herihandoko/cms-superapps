@@ -147,6 +147,7 @@ class SpanSumResource extends Resource
         return [
             'index' => Pages\ListSpanSums::route('/'),
             'create' => Pages\CreateSpanSum::route('/create'),
+            'view' => Pages\ViewSpanSum::route('/{record}'), // Added view route
             'edit' => Pages\EditSpanSum::route('/{record}/edit'),
         ];
     }

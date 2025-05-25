@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\SpanSum; // Added for data fetching
 use Carbon\Carbon;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -16,29 +17,39 @@ class StatsOverviewWidget extends BaseWidget
 
     protected function getStats(): array
     {
-
-        $startDate = ! is_null($this->filters['startDate'] ?? null) ?
+        $startDate = !is_null($this->filters['startDate'] ?? null) ?
             Carbon::parse($this->filters['startDate']) :
             null;
 
-        $endDate = ! is_null($this->filters['endDate'] ?? null) ?
+        $endDate = !is_null($this->filters['endDate'] ?? null) ?
             Carbon::parse($this->filters['endDate']) :
             now();
 
-        $isBusinessCustomersOnly = $this->filters['businessCustomersOnly'] ?? null;
-        $businessCustomerMultiplier = match (true) {
-            boolval($isBusinessCustomersOnly) => 2 / 3,
-            blank($isBusinessCustomersOnly) => 1,
-            default => 1 / 3,
-        };
+        $kodeOpd = $this->filters['kode_opd'] ?? null;
 
-        $diffInDays = $startDate ? $startDate->diffInDays($endDate) : 0;
+        $query = SpanSum::query();
 
-        $revenue = (int) (($startDate ? ($diffInDays * 137) : 192100) * $businessCustomerMultiplier);
-        $newCustomers = (int) (($startDate ? ($diffInDays * 7) : 1340) * $businessCustomerMultiplier);
-        $newOrders = (int) (($startDate ? ($diffInDays * 13) : 3543) * $businessCustomerMultiplier);
+        if ($kodeOpd) {
+            $query->where('kode_opd', $kodeOpd);
+        }
 
-        $formatNumber = function (int $number): string {
+        if ($startDate) {
+            $query->where('tgl_aduan', '>=', $startDate);
+        }
+        // Ensure endDate is inclusive if it's the same day or for filtering up to the end of that day
+        $query->where('tgl_aduan', '<=', $endDate->endOfDay());
+
+
+        // Clone the query for different aggregates to avoid issues
+        $totalAduan = (clone $query)->sum('total_aduan');
+        $proses = (clone $query)->sum('proses');
+        $selesai = (clone $query)->sum('selesai');
+
+        $formatNumber = function ($number): string { // Allow float/int
+            if (is_null($number)) {
+                return '0';
+            }
+            $number = (float) $number;
             if ($number < 1000) {
                 return (string) Number::format($number, 0);
             }
@@ -51,20 +62,20 @@ class StatsOverviewWidget extends BaseWidget
         };
 
         return [
-            Stat::make('Revenue', '$' . $formatNumber($revenue))
-                ->description('32k increase')
-                ->descriptionIcon('heroicon-m-arrow-trending-up')
-                ->chart([7, 2, 10, 3, 15, 4, 17])
-                ->color('success'),
-            Stat::make('New customers', $formatNumber($newCustomers))
-                ->description('3% decrease')
-                ->descriptionIcon('heroicon-m-arrow-trending-down')
-                ->chart([17, 16, 14, 15, 14, 13, 12])
-                ->color('danger'),
-            Stat::make('New orders', $formatNumber($newOrders))
-                ->description('7% increase')
-                ->descriptionIcon('heroicon-m-arrow-trending-up')
-                ->chart([15, 4, 10, 2, 12, 4, 12])
+            Stat::make('Total Aduan', $formatNumber($totalAduan))
+                // ->description('Description here') // Placeholder
+                // ->descriptionIcon('heroicon-m-arrow-trending-up') // Placeholder
+                // ->chart([7, 2, 10, 3, 15, 4, 17]) // Placeholder
+                ->color('primary'),
+            Stat::make('Proses', $formatNumber($proses))
+                // ->description('Description here') // Placeholder
+                // ->descriptionIcon('heroicon-m-arrow-trending-down') // Placeholder
+                // ->chart([17, 16, 14, 15, 14, 13, 12]) // Placeholder
+                ->color('warning'),
+            Stat::make('Selesai', $formatNumber($selesai))
+                // ->description('Description here') // Placeholder
+                // ->descriptionIcon('heroicon-m-arrow-trending-up') // Placeholder
+                // ->chart([15, 4, 10, 2, 12, 4, 12]) // Placeholder
                 ->color('success'),
         ];
     }
