@@ -34,7 +34,9 @@ class HargaKomoditasHarianKabkotaResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->can('viewHargaKomoditas');
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        return $user && $user->can('viewHargaKomoditas');
     }
 
     public static function form(Form $form): Form
@@ -109,14 +111,26 @@ class HargaKomoditasHarianKabkotaResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->visible(fn () => Auth::user()->can('editHargaKomoditas')),
+                    ->visible(function () {
+                        /** @var \App\Models\User|null $user */
+                        $user = Auth::user();
+                        return $user && $user->can('editHargaKomoditas');
+                    }),
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn () => Auth::user()->can('deleteHargaKomoditas')),
+                    ->visible(function () {
+                        /** @var \App\Models\User|null $user */
+                        $user = Auth::user();
+                        return $user && $user->can('deleteHargaKomoditas');
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()->can('deleteHargaKomoditas')),
+                        ->visible(function () {
+                            /** @var \App\Models\User|null $user */
+                            $user = Auth::user();
+                            return $user && $user->can('deleteHargaKomoditas');
+                        }),
                 ]),
             ]);
     }

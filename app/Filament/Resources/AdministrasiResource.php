@@ -30,7 +30,9 @@ class AdministrasiResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->can('viewAdministrasi');
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        return $user && $user->can('viewAdministrasi');
     }
 
     public static function form(Form $form): Form
@@ -92,14 +94,26 @@ class AdministrasiResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->visible(fn () => Auth::user()->can('editAdministrasi')),
+                    ->visible(function () {
+                        /** @var \App\Models\User|null $user */
+                        $user = Auth::user();
+                        return $user && $user->can('editAdministrasi');
+                    }),
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn () => Auth::user()->can('deleteAdministrasi')),
+                    ->visible(function () {
+                        /** @var \App\Models\User|null $user */
+                        $user = Auth::user();
+                        return $user && $user->can('deleteAdministrasi');
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()->can('deleteAdministrasi')),
+                        ->visible(function () {
+                            /** @var \App\Models\User|null $user */
+                            $user = Auth::user();
+                            return $user && $user->can('deleteAdministrasi');
+                        }),
                 ]),
             ]);
     }

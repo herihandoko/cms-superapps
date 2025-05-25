@@ -30,7 +30,9 @@ class KomoditasResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return Auth::user()->can('viewKomoditas');
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        return $user && $user->can('viewKomoditas');
     }
 
     public static function form(Form $form): Form
@@ -93,14 +95,26 @@ class KomoditasResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->visible(fn () => Auth::user()->can('editKomoditas')),
+                    ->visible(function () {
+                        /** @var \App\Models\User|null $user */
+                        $user = Auth::user();
+                        return $user && $user->can('editKomoditas');
+                    }),
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn () => Auth::user()->can('deleteKomoditas')),
+                    ->visible(function () {
+                        /** @var \App\Models\User|null $user */
+                        $user = Auth::user();
+                        return $user && $user->can('deleteKomoditas');
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn () => Auth::user()->can('deleteKomoditas')),
+                        ->visible(function () {
+                            /** @var \App\Models\User|null $user */
+                            $user = Auth::user();
+                            return $user && $user->can('deleteKomoditas');
+                        }),
                 ]),
             ]);
     }
