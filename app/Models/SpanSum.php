@@ -11,11 +11,18 @@ class SpanSum extends Model
     use HasFactory;
 
     /**
+     * The connection name for the model.
+     *
+     * @var string|null
+     */
+    protected $connection = 'superapps';
+
+    /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'superapps.span_sum';
+    protected $table = 'diskominfo_op_span_lapor';
 
     /**
      * Indicates if the model should be timestamped.
