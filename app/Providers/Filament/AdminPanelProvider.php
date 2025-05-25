@@ -44,7 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->unsavedChangesAlerts()
             ->brandLogo(fn () => view('components.filament-logo'))
-            ->favicon(asset('images/icon.png'))
+            ->favicon('/images/icon.png') // Changed to root-relative path
             ->brandLogoHeight('3rem')
             ->navigationGroups([
                 'Shop',
