@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Dashboard;
 use App\Http\Middleware\Authenticate;
+use Filament\Support\Colors\Color;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
@@ -38,9 +39,13 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
+            ->colors([
+                'primary' => Color::Green,
+            ])
             ->unsavedChangesAlerts()
-            ->brandLogo(fn () => view('filament.app.logo'))
-            ->brandLogoHeight('1.25rem')
+            ->brandLogo(fn () => view('components.filament-logo'))
+            ->favicon(asset('images/icon.png'))
+            ->brandLogoHeight('3rem')
             ->navigationGroups([
                 'Shop',
                 'Blog',

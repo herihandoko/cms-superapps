@@ -37,4 +37,15 @@ return [
 
     'default_filesystem_disk' => env('FILAMENT_FILESYSTEM_DISK', 'public'),
 
+    'auth' => [
+        'guard' => 'web',
+        'pages' => [
+            'login' => \Filament\Pages\Auth\Login::class,
+        ],
+        'user' => [
+            'model' => App\Models\User::class,
+        ],
+    ],
+
+
 ];
