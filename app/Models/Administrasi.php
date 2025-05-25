@@ -21,7 +21,7 @@ class Administrasi extends Model
      *
      * @var string
      */
-    protected $table = 'master_administrasi';
+    protected $table = 'badanpangan_m_administrasi';
 
     /**
      * The primary key associated with the table.
