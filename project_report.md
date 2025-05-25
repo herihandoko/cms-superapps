@@ -47,7 +47,7 @@ The project follows a standard Laravel application structure:
 *   [`app/`](app/): Contains the core code of the application, including Models, Controllers, Filament Resources, Http Kernel, Console Kernel.
     *   [`app/Filament/`](app/Filament/): Houses Filament-specific code like Resources, Pages, Widgets, and Clusters.
     *   [`app/Http/`](app/Http/): Contains controllers, middleware, and form requests.
-    *   [`app/Models/`](app/Models/): (Implicitly, Laravel 8+ style, models might be directly in `app/` or a dedicated `app/Models` directory if created by the developer).
+    *   [`app/Models/`](app/Models/): Contains Eloquent models.
 *   [`bootstrap/`](bootstrap/): Contains files that bootstrap the framework and configure autoloading.
 *   [`config/`](config/): Contains all of the application's configuration files.
 *   [`database/`](database/): Contains database migrations, factories, and seeders.
@@ -104,3 +104,177 @@ The [`README.md`](README.md:1) provides the following setup instructions:
 *   `laravel-vite-plugin: ^0.5.0` (Laravel integration for Vite)
 *   `autoprefixer: ^10.4.14`
 *   `postcss: ^8.4.28`
+
+**7. View Script Examples**
+
+This section provides a glimpse into some of the Blade templates used in the project.
+
+**a. Main Application Layout (`resources/views/components/layouts/app.blade.php`)**
+
+This file defines the main HTML structure for the application pages. It includes common head elements, styles, and scripts.
+
+```html
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8" />
+
+        <meta name="application-name" content="{{ config('app.name') }}" />
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>{{ config('app.name') }}</title>
+
+        <style>
+            [x-cloak] {
+                display: none !important;
+            }
+        </style>
+
+        @filamentStyles
+        @vite('resources/css/app.css')
+    </head>
+
+    <body class="antialiased">
+        {{ $slot }}
+
+        @filamentScripts
+        @vite('resources/js/app.js')
+    </body>
+</html>
+```
+
+**b. Livewire Form Component (`resources/views/livewire/form.blade.php`)**
+
+This is an example of a Livewire component's Blade view, typically used for dynamic forms. It renders a form managed by a corresponding Livewire PHP class.
+
+```html
+<form wire:submit="submit" class="max-w-3xl mx-auto w-full p-8 space-y-6">
+    {{ $this->form }}
+
+    {{ json_encode($this->data) }}
+
+    <x-filament::button type="submit">
+        Submit
+    </x-filament::button>
+</form>
+```
+
+**c. Included Assets**
+
+The main layout includes CSS and JavaScript files processed by Vite.
+
+**i. `resources/css/app.css`**
+
+This file is the main entry point for CSS and primarily includes Tailwind CSS directives.
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+**ii. `resources/js/app.js`**
+
+This file is the main entry point for JavaScript. In the current state of the project, this file is empty.
+```javascript
+// This file is currently empty.
+// Custom JavaScript for the application would be added here.
+```
+
+**8. Detailed Feature Structure**
+
+This section outlines the project structure for key features, focusing on Models, Filament Resources (controllers/managers), and Filament Pages (views).
+
+**a. Menu Structure (Navigation)**
+
+Filament's navigation menu is primarily configured through:
+*   **Navigation Groups**: Defined in [`app/Providers/AppServiceProvider.php`](app/Providers/AppServiceProvider.php:36) (e.g., 'Span Lapor', 'Harga Komoditas', 'Master', 'User Management').
+*   **Filament Resources**: Individual resources define their navigation label, sort order, slug, and assign themselves to a navigation group.
+    *   Example: [`app/Filament/Resources/SpanSumResource.php`](app/Filament/Resources/SpanSumResource.php:31) is in 'Span Lapor'.
+    *   Example: [`app/Filament/Resources/HargaKomoditasHarianKabkotaResource.php`](app/Filament/Resources/HargaKomoditasHarianKabkotaResource.php:29) is in 'Harga Komoditas'.
+
+**b. SPAN Lapor**
+*   **Navigation Group**: 'Span Lapor'
+*   **Filament Resource**: [`app/Filament/Resources/SpanSumResource.php`](app/Filament/Resources/SpanSumResource.php)
+*   **Model**: [`app/Models/SpanSum.php`](app/Models/SpanSum.php) (Table: `superapps.span_sum`)
+    *   *Related Model*: [`app/Models/MasterOpd.php`](app/Models/MasterOpd.php)
+*   **Filament Pages (Views)**:
+    *   List: [`app/Filament/Resources/SpanSumResource/Pages/ListSpanSums.php`](app/Filament/Resources/SpanSumResource/Pages/ListSpanSums.php)
+    *   Create: [`app/Filament/Resources/SpanSumResource/Pages/CreateSpanSum.php`](app/Filament/Resources/SpanSumResource/Pages/CreateSpanSum.php)
+    *   Edit: [`app/Filament/Resources/SpanSumResource/Pages/EditSpanSum.php`](app/Filament/Resources/SpanSumResource/Pages/EditSpanSum.php)
+*   **Permissions**: `viewSpanSummary`, `addSpanSummary`, `editSpanSummary`, `deleteSpanSummary` (defined in Resource)
+
+**c. Harga Pangan (Harga Komoditas)**
+*   **Navigation Group**: 'Harga Komoditas'
+*   **Sub-Feature: Harga Harian Kab/Kota**
+    *   **Filament Resource**: [`app/Filament/Resources/HargaKomoditasHarianKabkotaResource.php`](app/Filament/Resources/HargaKomoditasHarianKabkotaResource.php)
+        *   Navigation Label: 'Harga Harian Kab/Kota'
+        *   Slug: `harga-komoditas/harian-kab-kota`
+    *   **Model**: [`app/Models/HargaKomoditasHarianKabkota.php`](app/Models/HargaKomoditasHarianKabkota.php) (Table: `harga_komoditas_harian_kabkota`)
+        *   *Related Models*: [`app/Models/Komoditas.php`](app/Models/Komoditas.php), [`app/Models/Administrasi.php`](app/Models/Administrasi.php)
+    *   **Filament Pages (Views)**:
+        *   List: [`app/Filament/Resources/HargaKomoditasHarianKabkotaResource/Pages/ListHargaKomoditasHarianKabkotas.php`](app/Filament/Resources/HargaKomoditasHarianKabkotaResource/Pages/ListHargaKomoditasHarianKabkotas.php)
+        *   Create: [`app/Filament/Resources/HargaKomoditasHarianKabkotaResource/Pages/CreateHargaKomoditasHarianKabkota.php`](app/Filament/Resources/HargaKomoditasHarianKabkotaResource/Pages/CreateHargaKomoditasHarianKabkota.php)
+        *   Edit: [`app/Filament/Resources/HargaKomoditasHarianKabkotaResource/Pages/EditHargaKomoditasHarianKabkota.php`](app/Filament/Resources/HargaKomoditasHarianKabkotaResource/Pages/EditHargaKomoditasHarianKabkota.php)
+    *   **Permissions**: `viewHargaKomoditas`, `addHargaKomoditas`, `editHargaKomoditas`, `deleteHargaKomoditas`
+*   **Sub-Feature: Ketersediaan Pangan**
+    *   **Filament Resource**: [`app/Filament/Resources/KetersediaanPanganResource.php`](app/Filament/Resources/KetersediaanPanganResource.php)
+        *   Navigation Label: 'Ketersediaan Pangan'
+    *   **Model**: [`app/Models/KetersediaanPangan.php`](app/Models/KetersediaanPangan.php) (Table: `ketersediaan_pangan`)
+    *   **Filament Pages (Views)**:
+        *   List: [`app/Filament/Resources/KetersediaanPanganResource/Pages/ListKetersediaanPangans.php`](app/Filament/Resources/KetersediaanPanganResource/Pages/ListKetersediaanPangans.php)
+        *   Create: [`app/Filament/Resources/KetersediaanPanganResource/Pages/CreateKetersediaanPangan.php`](app/Filament/Resources/KetersediaanPanganResource/Pages/CreateKetersediaanPangan.php)
+        *   Edit: [`app/Filament/Resources/KetersediaanPanganResource/Pages/EditKetersediaanPangan.php`](app/Filament/Resources/KetersediaanPanganResource/Pages/EditKetersediaanPangan.php)
+    *   **Permissions**: `viewKetersediaanPangan`, `addKetersediaanPangan`, `editKetersediaanPangan`, `deleteKetersediaanPangan`
+
+**d. Master Data**
+*   **Navigation Group**: 'Master'
+*   **Sub-Feature: Master OPD**
+    *   **Filament Resource**: [`app/Filament/Resources/MasterOpdResource.php`](app/Filament/Resources/MasterOpdResource.php)
+    *   **Model**: [`app/Models/MasterOpd.php`](app/Models/MasterOpd.php) (Table: `master_opd`)
+    *   **Filament Pages (Views)**:
+        *   List: [`app/Filament/Resources/MasterOpdResource/Pages/ListMasterOpds.php`](app/Filament/Resources/MasterOpdResource/Pages/ListMasterOpds.php)
+        *   Create: [`app/Filament/Resources/MasterOpdResource/Pages/CreateMasterOpd.php`](app/Filament/Resources/MasterOpdResource/Pages/CreateMasterOpd.php)
+        *   Edit: [`app/Filament/Resources/MasterOpdResource/Pages/EditMasterOpd.php`](app/Filament/Resources/MasterOpdResource/Pages/EditMasterOpd.php)
+        *   View: [`app/Filament/Resources/MasterOpdResource/Pages/ViewMasterOpd.php`](app/Filament/Resources/MasterOpdResource/Pages/ViewMasterOpd.php)
+    *   **Permissions**: `viewMasterOpd`, `addMasterOpd`, `editMasterOpd`, `deleteMasterOpd` (via Laravel Gates)
+*   **Sub-Feature: Komoditas** (Also relevant to Harga Pangan)
+    *   **Filament Resource**: [`app/Filament/Resources/KomoditasResource.php`](app/Filament/Resources/KomoditasResource.php)
+        *   Navigation Label: 'Komoditas'
+        *   Slug: `master/komoditas`
+    *   **Model**: [`app/Models/Komoditas.php`](app/Models/Komoditas.php) (Table: `master_komoditas`)
+    *   **Filament Pages (Views)**:
+        *   List: [`app/Filament/Resources/KomoditasResource/Pages/ListKomoditas.php`](app/Filament/Resources/KomoditasResource/Pages/ListKomoditas.php)
+        *   Create: [`app/Filament/Resources/KomoditasResource/Pages/CreateKomoditas.php`](app/Filament/Resources/KomoditasResource/Pages/CreateKomoditas.php)
+        *   Edit: [`app/Filament/Resources/KomoditasResource/Pages/EditKomoditas.php`](app/Filament/Resources/KomoditasResource/Pages/EditKomoditas.php)
+    *   **Permissions**: `viewKomoditas`, `addKomoditas`, `editKomoditas`, `deleteKomoditas`
+*   **Sub-Feature: Administrasi**
+    *   **Filament Resource**: [`app/Filament/Resources/AdministrasiResource.php`](app/Filament/Resources/AdministrasiResource.php)
+        *   Slug: `master/administrasi`
+    *   **Model**: [`app/Models/Administrasi.php`](app/Models/Administrasi.php) (Table: `master_administrasi`)
+    *   **Filament Pages (Views)**: Standard List, Create, Edit pages are typically generated.
+
+**e. User Management**
+*   **Navigation Group**: 'User Management'
+*   **Sub-Feature: Users**
+    *   **Filament Resource**: [`app/Filament/Resources/UserResource.php`](app/Filament/Resources/UserResource.php)
+    *   **Model**: [`app/Models/User.php`](app/Models/User.php) (Uses `Spatie\Permission\Traits\HasRoles`)
+    *   **Filament Pages (Views)**:
+        *   List: [`app/Filament/Resources/UserResource/Pages/ListUsers.php`](app/Filament/Resources/UserResource/Pages/ListUsers.php)
+        *   Create: [`app/Filament/Resources/UserResource/Pages/CreateUser.php`](app/Filament/Resources/UserResource/Pages/CreateUser.php)
+        *   Edit: [`app/Filament/Resources/UserResource/Pages/EditUser.php`](app/Filament/Resources/UserResource/Pages/EditUser.php)
+*   **Sub-Feature: Roles**
+    *   **Filament Resource**: [`app/Filament/Resources/RoleResource.php`](app/Filament/Resources/RoleResource.php)
+    *   **Model**: `Spatie\Permission\Models\Role` (from Spatie Laravel Permission package)
+    *   **Filament Pages (Views)**:
+        *   List: [`app/Filament/Resources/RoleResource/Pages/ListRoles.php`](app/Filament/Resources/RoleResource/Pages/ListRoles.php)
+        *   Create: [`app/Filament/Resources/RoleResource/Pages/CreateRole.php`](app/Filament/Resources/RoleResource/Pages/CreateRole.php)
+        *   Edit: [`app/Filament/Resources/RoleResource/Pages/EditRole.php`](app/Filament/Resources/RoleResource/Pages/EditRole.php)
+*   **Sub-Feature: Permissions**
+    *   **Filament Resource**: [`app/Filament/Resources/PermissionResource.php`](app/Filament/Resources/PermissionResource.php)
+    *   **Model**: `Spatie\Permission\Models\Permission` (from Spatie Laravel Permission package)
+    *   **Filament Pages (Views)**:
+        *   List: [`app/Filament/Resources/PermissionResource/Pages/ListPermissions.php`](app/Filament/Resources/PermissionResource/Pages/ListPermissions.php)
+        *   Create: [`app/Filament/Resources/PermissionResource/Pages/CreatePermission.php`](app/Filament/Resources/PermissionResource/Pages/CreatePermission.php)
+        *   Edit: [`app/Filament/Resources/PermissionResource/Pages/EditPermission.php`](app/Filament/Resources/PermissionResource/Pages/EditPermission.php)
