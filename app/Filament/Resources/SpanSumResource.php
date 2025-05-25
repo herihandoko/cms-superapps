@@ -14,6 +14,10 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter; // Added for select filter
+use Filament\Tables\Filters\Indicator; // Added for indicator
+use Filament\Tables\Filters\SelectFilter; // Added for select filter
+use Filament\Tables\Filters\TernaryFilter; // Added for ternary filter
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model; // Added for type hinting
@@ -122,7 +126,30 @@ class SpanSumResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Filter::make('tgl_aduan')
+                    ->label('Rentang Tanggal')
+                    ->form([
+                        DatePicker::make('created_from')
+                            ->label('Dari Tanggal'),
+                        DatePicker::make('created_until')
+                            ->label('Sampai Tanggal'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn(Builder $q) => $q->whereDate('tgl_aduan', '>=', $data['created_from'])
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn(Builder $q) => $q->whereDate('tgl_aduan', '<=', $data['created_until'])
+                            );
+                    }),
+                SelectFilter::make('masterOpd') // Used FQCN for consistency
+                    ->label('OPD')
+                    ->relationship('masterOpd', 'nama_opd') // Assumes 'nama_opd' is the display column in MasterOpd
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
