@@ -15,6 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth; // Added
 
 class RoleResource extends Resource
 {
@@ -72,6 +73,13 @@ class RoleResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'User Management';
+        return 'User Management'; // Keep existing sort order if intended
+    }
+
+    public static function canViewAny(): bool
+    {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        return $user && $user->hasRole('superadmin');
     }
 }
