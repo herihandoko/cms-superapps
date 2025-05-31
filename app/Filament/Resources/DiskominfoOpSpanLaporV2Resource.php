@@ -129,7 +129,72 @@ class DiskominfoOpSpanLaporV2Resource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('tracking_id')
+                    ->form([
+                        Forms\Components\TextInput::make('tracking_id')
+                            ->label('Tracking ID')
+                            ->placeholder('Cari Tracking ID'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['tracking_id'],
+                            fn (Builder $query, $trackingId): Builder => $query->where('tracking_id', 'like', "%{$trackingId}%"),
+                        );
+                    }),
+                Tables\Filters\Filter::make('tanggal_laporan')
+                    ->form([
+                        Forms\Components\DatePicker::make('tanggal_dari')
+                            ->label('Dari Tanggal'),
+                        Forms\Components\DatePicker::make('tanggal_sampai')
+                            ->label('Sampai Tanggal'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['tanggal_dari'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('tanggal_laporan', '>=', $date),
+                            )
+                            ->when(
+                                $data['tanggal_sampai'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('tanggal_laporan', '<=', $date),
+                            );
+                    }),
+                Tables\Filters\Filter::make('waktu_laporan')
+                    ->form([
+                        Forms\Components\TimePicker::make('waktu_dari')
+                            ->label('Dari Jam')
+                            ->seconds(false),
+                        Forms\Components\TimePicker::make('waktu_sampai')
+                            ->label('Sampai Jam')
+                            ->seconds(false),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['waktu_dari'],
+                                fn (Builder $query, $time): Builder => $query->whereTime('waktu_laporan', '>=', $time),
+                            )
+                            ->when(
+                                $data['waktu_sampai'],
+                                fn (Builder $query, $time): Builder => $query->whereTime('waktu_laporan', '<=', $time),
+                            );
+                    }),
+                Tables\Filters\Filter::make('nama_pelapor')
+                    ->form([
+                        Forms\Components\TextInput::make('nama_pelapor')
+                            ->label('Nama Pelapor')
+                            ->placeholder('Cari Nama Pelapor'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['nama_pelapor'],
+                            fn (Builder $query, $nama): Builder => $query->where('nama_pelapor', 'like', "%{$nama}%"),
+                        );
+                    }),
+                Tables\Filters\SelectFilter::make('status_laporan')
+                    ->label('Status Laporan')
+                    ->options(fn (): array => DiskominfoOpSpanLaporV2::distinct()->pluck('status_laporan', 'status_laporan')->toArray())
+                    ->multiple()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
