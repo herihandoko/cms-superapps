@@ -35,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
         Filament::serving(function () {
             Filament::registerNavigationGroups([
                 'Span Lapor',
+                'Dapodik',
                 'Dukcapil',
                 'Harga Komoditas',
                 'Master',
