@@ -1,315 +1,395 @@
 # API Documentation
 
 ## Overview
-This document provides comprehensive documentation for all API endpoints in the CMS Superapp, including Dashboard API and Dapodik (Data Pokok Pendidikan) API.
 
-## Base URL
-```
-http://your-domain/api
-```
+This API provides access to dashboard metrics and Dapodik (Data Pokok Pendidikan) data with Bearer token authentication using Laravel Sanctum.
 
 ## Authentication
-All endpoints require authentication. Include your authentication token in the request header:
-```
-Authorization: Bearer your-token-here
-```
 
-## Common Response Format
-All endpoints follow a standard response format:
+All API endpoints (except login) require Bearer token authentication. The token must be included in the `Authorization` header.
 
-```json
+### Getting Started
+
+1. **Login** to get an access token
+2. **Include the token** in all subsequent requests
+3. **Refresh the token** when needed
+4. **Logout** to revoke the token
+
+### Authentication Endpoints
+
+#### Login
+```http
+POST /api/login
+Content-Type: application/json
+
 {
-    "success": true,
-    "data": {
-        // Endpoint specific data
-    }
+  "email": "user@example.com",
+  "password": "password123",
+  "device_name": "Postman"
 }
 ```
 
-Error responses follow this format:
+**Response:**
 ```json
 {
-    "success": false,
-    "message": "Error message",
-    "errors": {
-        // Validation errors if any
-    }
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "id": 1,
+      "name": "John Doe",
+      "email": "user@example.com",
+      "email_verified_at": "2024-01-01T00:00:00.000000Z"
+    },
+    "token": "1|abc123def456...",
+    "token_type": "Bearer",
+    "expires_at": null
+  }
 }
 ```
 
----
+#### Get User Info
+```http
+GET /api/user
+Authorization: Bearer 1|abc123def456...
+```
 
-# Dashboard API
+#### Refresh Token
+```http
+POST /api/refresh
+Authorization: Bearer 1|abc123def456...
+```
 
-## Base URL: `/api/dashboard`
+#### Logout
+```http
+POST /api/logout
+Authorization: Bearer 1|abc123def456...
+```
 
-### Endpoints:
+## Dashboard API Endpoints
 
-1. **GET /summary** - Get overall summary statistics
-2. **GET /unit-kerja** - Get unit kerja data with pagination
-3. **GET /unit-kerja/top** - Get top performing units
-4. **GET /activity/last-seen** - Get recent activity updates
-5. **GET /status-detail** - Get detailed status breakdown
-6. **GET /durasi/rtl** - Get RTL duration statistics
-7. **GET /durasi/rhp** - Get RHP duration statistics
+### Summary Statistics
+```http
+GET /api/dashboard/summary?period=month
+Authorization: Bearer 1|abc123def456...
+```
 
-### Example Usage:
+**Query Parameters:**
+- `period` (optional): Time period - `today`, `week`, `month`, `year` (default: `month`)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "summary": {
+      "total_records": 1250,
+      "total_unit_kerja": 45,
+      "average_persentase_tl": 78.5,
+      "total_rtl": 890,
+      "total_rhp": 360
+    },
+    "period": "month",
+    "generated_at": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+### Unit Kerja List
+```http
+GET /api/dashboard/unit-kerja?page=1&per_page=15&sort_by=persentase_tl&sort_direction=desc
+Authorization: Bearer 1|abc123def456...
+```
+
+**Query Parameters:**
+- `page` (optional): Page number (default: 1)
+- `per_page` (optional): Items per page (default: 15, max: 100)
+- `sort_by` (optional): Sort field (default: `persentase_tl`)
+- `sort_direction` (optional): Sort direction - `asc`, `desc` (default: `desc`)
+- `search` (optional): Search term
+- `period` (optional): Time period filter
+
+### Top Unit Kerja
+```http
+GET /api/dashboard/unit-kerja/top?limit=10&period=month
+Authorization: Bearer 1|abc123def456...
+```
+
+**Query Parameters:**
+- `limit` (optional): Number of top units (default: 10, max: 50)
+- `period` (optional): Time period filter
+
+### Last Seen Activity
+```http
+GET /api/dashboard/activity/last-seen?limit=10
+Authorization: Bearer 1|abc123def456...
+```
+
+**Query Parameters:**
+- `limit` (optional): Number of activities (default: 10, max: 50)
+
+### Status Detail
+```http
+GET /api/dashboard/status-detail?period=month
+Authorization: Bearer 1|abc123def456...
+```
+
+### RTL Duration Statistics
+```http
+GET /api/dashboard/durasi/rtl?period=month
+Authorization: Bearer 1|abc123def456...
+```
+
+### RHP Duration Statistics
+```http
+GET /api/dashboard/durasi/rhp?period=month
+Authorization: Bearer 1|abc123def456...
+```
+
+## Dapodik API Endpoints
+
+### Dashboard Summary
+```http
+GET /api/dapodik/dashboard/summary
+Authorization: Bearer 1|abc123def456...
+```
+
+### Dashboard Statistics
+```http
+GET /api/dapodik/dashboard/statistics
+Authorization: Bearer 1|abc123def456...
+```
+
+### Schools List
+```http
+GET /api/dapodik/schools?page=1&per_page=15&kabupaten=Jakarta%20Pusat&bentuk_pendidikan=SD&sort_by=nama_satuan_pendidikan&sort_order=asc
+Authorization: Bearer 1|abc123def456...
+```
+
+**Query Parameters:**
+- `page` (optional): Page number
+- `per_page` (optional): Items per page (max: 100)
+- `kabupaten` (optional): Filter by kabupaten
+- `bentuk_pendidikan` (optional): Filter by education type
+- `sort_by` (optional): Sort field
+- `sort_order` (optional): Sort order - `asc`, `desc`
+
+### School Detail
+```http
+GET /api/dapodik/schools/{npsn}
+Authorization: Bearer 1|abc123def456...
+```
+
+### Nearby Schools
+```http
+GET /api/dapodik/schools/nearby?lat=-6.2088&lng=106.8456&radius=5
+Authorization: Bearer 1|abc123def456...
+```
+
+**Query Parameters:**
+- `lat` (required): Latitude
+- `lng` (required): Longitude
+- `radius` (optional): Radius in km (default: 5)
+
+### Geographic Data
+```http
+GET /api/dapodik/locations/kabupaten
+Authorization: Bearer 1|abc123def456...
+```
+
+```http
+GET /api/dapodik/locations/kecamatan?kabupaten=Jakarta%20Pusat
+Authorization: Bearer 1|abc123def456...
+```
+
+```http
+GET /api/dapodik/locations/desa?kecamatan=Menteng
+Authorization: Bearer 1|abc123def456...
+```
+
+### Analytics
+```http
+GET /api/dapodik/analytics/students?kabupaten=Jakarta%20Pusat
+Authorization: Bearer 1|abc123def456...
+```
+
+```http
+GET /api/dapodik/analytics/teachers?kabupaten=Jakarta%20Pusat
+Authorization: Bearer 1|abc123def456...
+```
+
+```http
+GET /api/dapodik/analytics/classrooms
+Authorization: Bearer 1|abc123def456...
+```
+
+### Accreditation
+```http
+GET /api/dapodik/accreditation/summary
+Authorization: Bearer 1|abc123def456...
+```
+
+```http
+GET /api/dapodik/accreditation/expiring
+Authorization: Bearer 1|abc123def456...
+```
+
+### Comparison & Benchmark
+```http
+GET /api/dapodik/compare/kabupaten
+Authorization: Bearer 1|abc123def456...
+```
+
+```http
+GET /api/dapodik/compare/bentuk-pendidikan
+Authorization: Bearer 1|abc123def456...
+```
+
+### Search & Discovery
+```http
+GET /api/dapodik/search?q=SDN%2001&limit=10
+Authorization: Bearer 1|abc123def456...
+```
+
+**Query Parameters:**
+- `q` (required): Search query (min 2 characters)
+- `limit` (optional): Result limit (default: 10, max: 50)
+
+```http
+GET /api/dapodik/map-data?kabupaten=Jakarta%20Pusat
+Authorization: Bearer 1|abc123def456...
+```
+
+### Trends & Forecasting
+```http
+GET /api/dapodik/trends/enrollment
+Authorization: Bearer 1|abc123def456...
+```
+
+```http
+GET /api/dapodik/trends/growth
+Authorization: Bearer 1|abc123def456...
+```
+
+### Export
+```http
+GET /api/dapodik/export/excel?kabupaten=Jakarta%20Pusat&bentuk_pendidikan=SD
+Authorization: Bearer 1|abc123def456...
+```
+
+### Health Check
+```http
+GET /api/dapodik/health
+Authorization: Bearer 1|abc123def456...
+```
+
+## Error Responses
+
+### Authentication Errors
+
+**401 Unauthorized**
+```json
+{
+  "message": "Unauthenticated"
+}
+```
+
+**401 Invalid Credentials**
+```json
+{
+  "success": false,
+  "message": "Invalid credentials"
+}
+```
+
+### Validation Errors
+
+**422 Validation Error**
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": {
+    "email": ["The email field is required."],
+    "password": ["The password field is required."]
+  }
+}
+```
+
+### General Errors
+
+**500 Internal Server Error**
+```json
+{
+  "success": false,
+  "message": "Internal server error",
+  "error": "Error details"
+}
+```
+
+## Rate Limiting
+
+API requests are limited to 60 requests per minute per user/IP address.
+
+## cURL Examples
+
+### Login
 ```bash
-# Get dashboard summary
-curl -X GET "http://your-domain/api/dashboard/summary" \
--H "Accept: application/json"
-
-# Get unit kerja data
-curl -X GET "http://your-domain/api/dashboard/unit-kerja?page=1&per_page=15" \
--H "Accept: application/json"
+curl -X POST "{{base_url}}/api/login" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "password123",
+    "device_name": "cURL"
+  }'
 ```
 
----
-
-# Dapodik API
-
-## Base URL: `/api/dapodik`
-
-### Dashboard & Analytics:
-1. **GET /dashboard/summary** - Get comprehensive dashboard summary
-2. **GET /dashboard/statistics** - Get detailed statistics breakdown
-
-### Schools:
-3. **GET /schools** - List schools with pagination and filtering
-4. **GET /schools/{npsn}** - Get school detail by NPSN
-5. **GET /schools/nearby** - Find nearby schools by coordinates
-
-### Geographic & Location:
-6. **GET /locations/kabupaten** - Get kabupaten list with school counts
-7. **GET /locations/kecamatan** - Get kecamatan list (filter by kabupaten)
-8. **GET /locations/desa** - Get desa list (filter by kecamatan)
-
-### Analytics:
-9. **GET /analytics/students** - Get student analytics by grade/gender
-10. **GET /analytics/teachers** - Get teacher and staff analytics
-11. **GET /analytics/classrooms** - Get classroom and rombongan belajar analytics
-
-### Accreditation:
-12. **GET /accreditation/summary** - Get accreditation statistics
-13. **GET /accreditation/expiring** - Get schools with expiring accreditation
-
-### Comparison & Benchmark:
-14. **GET /compare/kabupaten** - Compare educational metrics across kabupaten
-15. **GET /compare/bentuk-pendidikan** - Compare metrics across education types
-
-### Search & Discovery:
-16. **GET /search** - Search schools by name or NPSN
-17. **GET /map-data** - Get school data for mapping applications
-
-### Trends & Forecasting:
-18. **GET /trends/enrollment** - Get enrollment trends by education type
-19. **GET /trends/growth** - Get growth trends by kabupaten
-
-### Export & Health:
-20. **GET /export/excel** - Export data to Excel format
-21. **GET /health** - Check API health and database connection
-
-### Example Usage:
-
+### Get Dashboard Summary
 ```bash
-# Get Dapodik dashboard summary
-curl -X GET "http://your-domain/api/dapodik/dashboard/summary" \
--H "Accept: application/json"
-
-# List schools with filters
-curl -X GET "http://your-domain/api/dapodik/schools?kabupaten=Jakarta%20Pusat&bentuk_pendidikan=SD&page=1&per_page=15" \
--H "Accept: application/json"
-
-# Get school detail by NPSN
-curl -X GET "http://your-domain/api/dapodik/schools/20100101" \
--H "Accept: application/json"
-
-# Find nearby schools
-curl -X GET "http://your-domain/api/dapodik/schools/nearby?lat=-6.2088&lng=106.8456&radius=5" \
--H "Accept: application/json"
-
-# Search schools
-curl -X GET "http://your-domain/api/dapodik/search?q=SDN%2001&limit=10" \
--H "Accept: application/json"
-
-# Get student analytics
-curl -X GET "http://your-domain/api/dapodik/analytics/students?kabupaten=Jakarta%20Pusat" \
--H "Accept: application/json"
-
-# Get teacher analytics
-curl -X GET "http://your-domain/api/dapodik/analytics/teachers" \
--H "Accept: application/json"
-
-# Get accreditation summary
-curl -X GET "http://your-domain/api/dapodik/accreditation/summary" \
--H "Accept: application/json"
-
-# Compare kabupaten
-curl -X GET "http://your-domain/api/dapodik/compare/kabupaten" \
--H "Accept: application/json"
-
-# Get map data
-curl -X GET "http://your-domain/api/dapodik/map-data?kabupaten=Jakarta%20Pusat" \
--H "Accept: application/json"
-
-# Check API health
-curl -X GET "http://your-domain/api/dapodik/health" \
--H "Accept: application/json"
+curl -X GET "{{base_url}}/api/dashboard/summary?period=month" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer 1|abc123def456..."
 ```
 
-### Query Parameters for Schools Endpoint:
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| page | integer | No | Page number (default: 1) |
-| per_page | integer | No | Items per page (default: 15) |
-| search | string | No | Search by school name or NPSN |
-| kabupaten | string | No | Filter by kabupaten |
-| kecamatan | string | No | Filter by kecamatan |
-| bentuk_pendidikan | string | No | Filter by education type |
-| status_sekolah | string | No | Filter by school status |
-| sort_by | string | No | Sort field (default: nama_satuan_pendidikan) |
-| sort_order | string | No | Sort order (asc/desc) |
-
-### Sample Response Format:
-
-```json
-{
-    "success": true,
-    "data": [
-        {
-            "nama_satuan_pendidikan": "SDN 01 Jakarta Pusat",
-            "npsn": "20100101",
-            "bentuk_pendidikan": "SD",
-            "status_sekolah": "Negeri",
-            "alamat": "Jl. Sudirman No. 1",
-            "kabupaten_kota": "Jakarta Pusat",
-            "kecamatan": "Menteng",
-            "guru": 25,
-            "tendik": 5,
-            "jumlah_ruang_kelas": 12,
-            "akreditasi": "A",
-            "lintang": -6.2088,
-            "bujur": 106.8456
-        }
-    ],
-    "pagination": {
-        "current_page": 1,
-        "last_page": 10,
-        "per_page": 15,
-        "total": 150,
-        "from": 1,
-        "to": 15
-    }
-}
+### Get Schools List
+```bash
+curl -X GET "{{base_url}}/api/dapodik/schools?page=1&per_page=15&kabupaten=Jakarta%20Pusat" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer 1|abc123def456..."
 ```
 
-### Dashboard Summary Response:
-
-```json
-{
-    "success": true,
-    "data": {
-        "total_schools": 1250,
-        "total_teachers": 8500,
-        "total_students": 125000,
-        "total_classrooms": 4500,
-        "schools_by_status": {
-            "Negeri": 800,
-            "Swasta": 450
-        },
-        "schools_by_type": {
-            "SD": 500,
-            "SMP": 300,
-            "SMA": 250,
-            "SMK": 200
-        },
-        "top_kabupaten": [
-            {
-                "kabupaten_kota": "Jakarta Pusat",
-                "school_count": 150
-            }
-        ]
-    }
-}
+### Logout
+```bash
+curl -X POST "{{base_url}}/api/logout" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer 1|abc123def456..."
 ```
 
-### Student Analytics Response:
+## Postman Collection
 
-```json
-{
-    "success": true,
-    "data": {
-        "tka_total": 15000,
-        "tka_l": 7500,
-        "tka_p": 7500,
-        "t1_total": 18000,
-        "t1_l": 9000,
-        "t1_p": 9000,
-        "t2_total": 17500,
-        "t2_l": 8750,
-        "t2_p": 8750
-    }
-}
-```
+A complete Postman collection is available at `postman_collection.json` with all endpoints pre-configured with authentication headers.
 
----
+### Environment Variables
 
-## Error Handling
+Set up these environment variables in Postman:
 
-### HTTP Status Codes:
-- **200 OK**: Request successful
-- **400 Bad Request**: Invalid request parameters
-- **401 Unauthorized**: Authentication required
-- **404 Not Found**: Resource not found
-- **422 Unprocessable Entity**: Validation errors
-- **500 Internal Server Error**: Server error
+- `base_url`: Your API base URL (e.g., `http://localhost:8000`)
+- `token`: The Bearer token received from login
 
-### Error Response:
-```json
-{
-    "success": false,
-    "message": "Error description",
-    "errors": {
-        "field_name": ["Validation error message"]
-    }
-}
-```
+### Usage in Postman
 
-## Features
+1. Import the `postman_collection.json` file
+2. Set up environment variables
+3. Run the "Login" request to get a token
+4. The token will be automatically used in subsequent requests
 
-### Caching
-- Dashboard endpoints: 1 hour cache
-- Dapodik endpoints: 1 hour cache
-- Search endpoints: 30 minutes cache
+## Security Notes
 
-### Pagination
-- Default: 15 items per page
-- Maximum: 100 items per page
-- Pagination metadata included in response
-
-### Filtering & Sorting
-- Multiple filter parameters supported
-- Case-insensitive filtering
-- Configurable sorting (asc/desc)
-
-### Search
-- Partial matching
-- Case-insensitive search
-- Minimum 2 characters required
-- Search by school name or NPSN
-
-### Geographic Features
-- Nearby schools search by coordinates
-- Distance calculation in kilometers
-- Map data export for visualization
-
-### Data Export
-- Excel export functionality
-- Filtered data export
-- Bulk data retrieval
-
-### Health Monitoring
-- API health check endpoint
-- Database connection status
-- Data integrity validation
+- Tokens are stored securely using Laravel Sanctum
+- Tokens don't expire by default but can be configured
+- Each device gets a unique token
+- Tokens are automatically revoked on logout
+- Use HTTPS in production
+- Keep tokens secure and don't share them
+- Implement proper error handling for authentication failures 

@@ -2,11 +2,302 @@
 	"info": {
 		"_postman_id": "dapodik-api-collection",
 		"name": "Dapodik API Collection",
-		"description": "Comprehensive collection for testing Dapodik (Data Pokok Pendidikan) API endpoints",
+		"description": "Comprehensive collection for testing Dapodik (Data Pokok Pendidikan) API endpoints with Bearer token authentication",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "dapodik-api"
 	},
 	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"device_name\": \"Postman\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "login"]
+						},
+						"description": "Login to get Bearer token for API access"
+					}
+				},
+				{
+					"name": "Get User Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/user",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user"]
+						},
+						"description": "Get authenticated user information"
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/refresh",
+							"host": ["{{base_url}}"],
+							"path": ["api", "refresh"]
+						},
+						"description": "Refresh the current access token"
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "logout"]
+						},
+						"description": "Logout and revoke current token"
+					}
+				}
+			]
+		},
+		{
+			"name": "Dashboard API",
+			"item": [
+				{
+					"name": "Dashboard Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/summary?period=month",
+							"host": ["{{base_url}}"],
+							"path": ["api", "dashboard", "summary"],
+							"query": [
+								{"key": "period", "value": "month", "description": "Time period (today, week, month, year)"}
+							]
+						},
+						"description": "Get overall summary statistics for all metrics"
+					}
+				},
+				{
+					"name": "Unit Kerja List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/unit-kerja?page=1&per_page=15&sort_by=persentase_tl&sort_direction=desc",
+							"host": ["{{base_url}}"],
+							"path": ["api", "dashboard", "unit-kerja"],
+							"query": [
+								{"key": "page", "value": "1", "description": "Page number"},
+								{"key": "per_page", "value": "15", "description": "Items per page"},
+								{"key": "sort_by", "value": "persentase_tl", "description": "Sort field"},
+								{"key": "sort_direction", "value": "desc", "description": "Sort direction"}
+							]
+						},
+						"description": "Get data grouped by unit kerja with pagination and filtering options"
+					}
+				},
+				{
+					"name": "Top Unit Kerja",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/unit-kerja/top?limit=10&period=month",
+							"host": ["{{base_url}}"],
+							"path": ["api", "dashboard", "unit-kerja", "top"],
+							"query": [
+								{"key": "limit", "value": "10", "description": "Number of top units to return"},
+								{"key": "period", "value": "month", "description": "Time period"}
+							]
+						},
+						"description": "Get the top performing unit kerja based on persentase_tl"
+					}
+				},
+				{
+					"name": "Last Seen Activity",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/activity/last-seen?limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "dashboard", "activity", "last-seen"],
+							"query": [
+								{"key": "limit", "value": "10", "description": "Number of activities to return"}
+							]
+						},
+						"description": "Get the most recent activity updates"
+					}
+				},
+				{
+					"name": "Status Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/status-detail?period=month",
+							"host": ["{{base_url}}"],
+							"path": ["api", "dashboard", "status-detail"],
+							"query": [
+								{"key": "period", "value": "month", "description": "Time period"}
+							]
+						},
+						"description": "Get detailed status breakdown"
+					}
+				},
+				{
+					"name": "RTL Duration Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/durasi/rtl?period=month",
+							"host": ["{{base_url}}"],
+							"path": ["api", "dashboard", "durasi", "rtl"],
+							"query": [
+								{"key": "period", "value": "month", "description": "Time period"}
+							]
+						},
+						"description": "Get RTL (Rencana Tindak Lanjut) duration statistics"
+					}
+				},
+				{
+					"name": "RHP Duration Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/durasi/rhp?period=month",
+							"host": ["{{base_url}}"],
+							"path": ["api", "dashboard", "durasi", "rhp"],
+							"query": [
+								{"key": "period", "value": "month", "description": "Time period"}
+							]
+						},
+						"description": "Get RHP (Rencana Hasil Pengawasan) duration statistics"
+					}
+				}
+			]
+		},
 		{
 			"name": "Dashboard & Analytics",
 			"item": [
@@ -465,197 +756,6 @@
 							"path": ["api", "dapodik", "health"]
 						},
 						"description": "Check API health and database connection status"
-					}
-				}
-			]
-		},
-		{
-			"name": "Dashboard API",
-			"item": [
-				{
-					"name": "Dashboard Summary",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/dashboard/summary?period=month",
-							"host": ["{{base_url}}"],
-							"path": ["api", "dashboard", "summary"],
-							"query": [
-								{"key": "period", "value": "month", "description": "Time period (today, week, month, year)"}
-							]
-						},
-						"description": "Get overall summary statistics for all metrics"
-					}
-				},
-				{
-					"name": "Unit Kerja Data",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/dashboard/unit-kerja?page=1&per_page=15&sort_by=persentase_tl&sort_direction=desc",
-							"host": ["{{base_url}}"],
-							"path": ["api", "dashboard", "unit-kerja"],
-							"query": [
-								{"key": "page", "value": "1", "description": "Page number"},
-								{"key": "per_page", "value": "15", "description": "Items per page"},
-								{"key": "sort_by", "value": "persentase_tl", "description": "Sort field"},
-								{"key": "sort_direction", "value": "desc", "description": "Sort direction"}
-							]
-						},
-						"description": "Get data grouped by unit kerja with pagination and filtering options"
-					}
-				},
-				{
-					"name": "Top Performing Units",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/dashboard/unit-kerja/top?limit=10&period=month",
-							"host": ["{{base_url}}"],
-							"path": ["api", "dashboard", "unit-kerja", "top"],
-							"query": [
-								{"key": "limit", "value": "10", "description": "Number of top units to return"},
-								{"key": "period", "value": "month", "description": "Time period"}
-							]
-						},
-						"description": "Get the top performing unit kerja based on persentase_tl"
-					}
-				},
-				{
-					"name": "Last Seen Activity",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/dashboard/activity/last-seen?limit=10",
-							"host": ["{{base_url}}"],
-							"path": ["api", "dashboard", "activity", "last-seen"],
-							"query": [
-								{"key": "limit", "value": "10", "description": "Number of activities to return"}
-							]
-						},
-						"description": "Get the most recent activity updates"
-					}
-				},
-				{
-					"name": "Status Detail",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/dashboard/status-detail?period=month",
-							"host": ["{{base_url}}"],
-							"path": ["api", "dashboard", "status-detail"],
-							"query": [
-								{"key": "period", "value": "month", "description": "Time period"}
-							]
-						},
-						"description": "Get detailed status breakdown"
-					}
-				},
-				{
-					"name": "RTL Duration",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/dashboard/durasi/rtl?period=month",
-							"host": ["{{base_url}}"],
-							"path": ["api", "dashboard", "durasi", "rtl"],
-							"query": [
-								{"key": "period", "value": "month", "description": "Time period"}
-							]
-						},
-						"description": "Get RTL (Rencana Tindak Lanjut) duration statistics"
-					}
-				},
-				{
-					"name": "RHP Duration",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/dashboard/durasi/rhp?period=month",
-							"host": ["{{base_url}}"],
-							"path": ["api", "dashboard", "durasi", "rhp"],
-							"query": [
-								{"key": "period", "value": "month", "description": "Time period"}
-							]
-						},
-						"description": "Get RHP (Rencana Hasil Pengawasan) duration statistics"
 					}
 				}
 			]
